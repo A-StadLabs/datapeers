@@ -1,0 +1,32 @@
+{
+  "name": "labs-openfire",
+  "version": "1.0.0",
+  "authors": [
+    "Anonymous <anonymous@example.com>"
+  ],
+  "description": "An element providing a solution to no problem in particular.",
+  "keywords": [
+    "web-component",
+    "web-components",
+    "polymer",
+    "seed"
+  ],
+  "main": "labs-openfire.html",
+  "license": "http://polymer.github.io/LICENSE.txt",
+  "homepage": "https://github.com/<USERNAME>/seed-element/",
+  "ignore": [
+    "/.*",
+    "/test/",
+    "/demo/"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.0.0",
+    "strophe-openfire-websocket": "gunblues/strophe-openfire-websocket",
+    "strophe.js": "strophe/strophejs#~1.2.2",
+    "strophejs-plugins": "strophe/strophejs-plugins#~0.0.4",
+    "polyserve": "PolymerLabs/polyserve"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0"
+  }
+}

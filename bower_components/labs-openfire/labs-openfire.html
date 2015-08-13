@@ -1,0 +1,210 @@
+<!--
+@license
+MIT / Stad Antwerpen
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<script src="../../bower_components/strophe-openfire-websocket/strophe-openfire-websocket.js"></script>
+<script src="../../bower_components/strophe.js/strophe.js"></script>
+<script src="../../bower_components/strophejs-plugins/muc/strophe.muc.js"></script>
+<script src="../../bower_components/strophejs-plugins/register/strophe.register.js"></script>
+
+<!-- 
+
+Example: 
+<labs-openfire 
+                  id="openfireconnect"
+                  room="astadlabs" 
+                  on-logged-in="loggedin" 
+                  on-chat-msg="chatreceived"
+                  username="testuser"
+                  password="testpass"
+                  connected="{{connected}}">
+                </labs-openfire> 
+@demo
+-->
+<dom-module id="labs-openfire">
+  <style>
+    :host {
+      display: block;
+    }
+  </style>
+  <template id="openfire">
+  </template>
+</dom-module>
+<script>
+(function() {
+
+  var conn;
+
+  var createuser = function(username, pincode){
+    var callback = function (status) {
+        if (status === Strophe.Status.REGISTER) {
+          var that = this;
+          console.log('trying to register user: ', username, ' pass:',pincode);
+            conn2.register.fields.username = username;
+            conn2.register.fields.password = pincode;
+            conn2.register.submit();
+        } else if (status === Strophe.Status.REGISTERED) {
+            console.log("registered!");
+            return true;
+        }
+    };
+    
+    var conn2 = new Strophe.Connection("http://kingflurkel.dtdns.net:7070/http-bind/");
+    conn2.register.connect("http://kingflurkel.dtdns.net:7070/http-bind/", callback, 60, 5);
+  };
+
+  Polymer({
+    is: 'labs-openfire',
+
+    properties: {
+      foo: {
+        type: String,
+        value: 'bar',
+        notify: true
+      },
+
+      room: {
+        type: String,
+        value: 'astadlabs',
+        notify: true
+      },
+      
+      username: {
+        type: String,
+        notify: true,
+        observer: "_username"
+      },
+
+      pincode: {
+        type: String,
+        notify: true
+      },
+
+      openfireserver: {
+        type: String,
+        value: "kingflurkel.dtdns.net",
+        notify: true
+      },
+
+      connected: {
+        type: Boolean,
+        value: false
+      }
+    },
+
+    ready: function() {
+      
+    },
+
+    joinRoom: function(username, password){
+      var that = this;
+      console.log('ik ga joinen he!');
+      var room = this.room+"@conference.kingflurkel.dtdns.net";
+      var nick = username+"@kingflurkel.dtdns.net";
+      var password = password;
+      var history_attrs = null;
+      conn.muc.join(room, nick, that.msg_handler_cb, that.pres_handler_cb, that.roster_cb, password, history_attrs);
+    },
+
+    myFire: function(e){
+      this.fire('chat-msg', {detail: e});
+    },
+
+    logIets: function(e){
+      console.log('iets misschien? ', e);
+    },
+
+    setHandlers: function(){
+      var that = this;
+      conn.addHandler(that.logIets);
+    },
+
+    msg_handler_cb: function(msg){
+      var to = msg.getAttribute('to');
+      var from = msg.getAttribute('from');
+      var type = msg.getAttribute('type');
+      var elems = msg.getElementsByTagName('body');
+      var body = elems[0];
+      console.log('Received ',type, ' ','message from ', from, ' to: ', to, ' Contents: ', body);
+      return true;
+    },
+
+    pres_handler_cb: function(){
+      console.log('presence handler');
+      return true;
+    },
+
+    roster_cb: function(){
+      console.log('roster handler');
+      return true;
+    },
+
+    _username: function(){
+      console.log("username changed: ", this.username, ' pass: ', this.pincode);
+      //this.login();
+    },
+
+    /**
+     * Create a user on openfire server. Authenticate after user registration. Needs username and password.
+     Example: this.$.openfire.createUser(username, password);
+     */
+
+    createUser: function(username, pincode){
+      
+      if(createuser(username, pincode)){
+        console.log('user is registered');
+        this.fire('user-created', { detail: 'none'});
+      };
+
+      // this.registered = createuser(username, pincode, function(){
+      //   console.log('testing testing');
+      // });
+      // if(this.registered){
+      //   console.log('user is registered');
+      //   this.fire('user-created', { detail: 'none'});
+      // };
+    },
+
+    sendTest: function(){
+      var message = "just a test";
+      var reply = $msg({
+        to: 'kingflurkel@kingflurkel.dtdns.net',
+        type: 'chat'
+      })
+      .cnode(Strophe.xmlElement('body', message)).up()
+      .c('active', {xmlns: "http://jabber.org/protocol/chatstates"});
+      conn.send(reply);
+      return true;
+    },
+
+    login: function(username, password){
+
+      conn = new Openfire.Connection("ws://kingflurkel.dtdns.net:7070/ws/server");
+      
+      var that = this;
+      
+
+      conn.connect(username, password, function(status){
+        if (status === Strophe.Status.CONNECTED) {
+          console.log('connected');
+          that.joinRoom(username, password);
+          conn.addHandler(that.logIets);
+          conn.send($pres().tree());
+          //that.sendTest();
+          that.fire('logged-in');
+          that.connected = true;
+        } else if (status === Strophe.Status.DISCONNECTED) {
+            //$(document).trigger('disconnected');
+          //console.log('no yoooo');
+          that.fire('disconnected');
+          that.connected = false;
+        };
+      });
+
+      //console.log('Button is geklikt. User: ', username, ' Pass: ', password);
+    }
+  });
+})();
+</script>

@@ -1,0 +1,257 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/neon-animation/neon-animation.html">
+<link rel="import" href="../../bower_components/neon-animation/neon-animations.html">
+<link rel="import" href="../../bower_components/neon-animation/neon-animated-pages.html">
+<link rel="import" href="../../bower_components/neon-animation/neon-animatable.html">
+
+
+<dom-module id="dp-stage">
+  <style>
+    :host {
+      display: block;
+      @apply(--layout-fit);
+    }
+
+
+    neon-animated-pages {
+      height: 94%;
+
+    }
+  .drawerclicker {
+    width: 100%;
+    height: 6%;
+    background-color: var(--primary-green);
+    @apply(--layout-vertical);
+    @apply(--layout-start);
+  }
+/*
+  .drawerclicker img {
+    width: 100%;
+    height: 100%;
+
+  }
+*/
+
+  .drawer {
+    background-color: var(--primary-green);
+    height: 100%;
+    padding: 10px;
+    box-sizing:border-box;
+  }
+
+  .drawer p,h2,h3 {
+    margin: 0px;
+    padding: 0px;
+  }
+
+
+  .drawerbtn {
+    cursor: pointer;
+    margin: 6px 0px 0px 6px;
+  }
+
+
+
+  .randommsg {
+    @apply(--layout-vertical);
+    @apply(--layout-center-center);
+    background-color: var(--primary-green);
+    text-align: center;
+    padding: 10%;
+    height: 100%;
+    box-sizing:border-box;
+
+  }
+
+
+  h2 {
+          font-weight: 300;
+      -webkit-font-smoothing: antialiased;
+      line-height: 125%;
+      color: white;
+  }
+
+  button {
+      font-family: 'Open Sans', sans-serif;
+      font-weight: 600;
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+      padding: 20px;
+      margin: 40px 0px 0px 0px;
+      background-color: rgba(255,255,255,1);
+      color: var(--primary-green);
+      outline: 0;
+      border: none;
+      text-align: center;
+      border-radius: 5px;
+      width: 200px;
+  }
+
+
+    button:hover {
+    box-shadow: 2px 2px 0px rgba(0,0,0,0.2);
+    }
+
+    button:active {
+    box-shadow: 0px 0px 0px rgba(0,0,0,0.2);
+    }
+
+
+  </style>
+  <template>
+<!--     <div>Hello from <span>{{foo}}</span></div> -->
+    <paper-drawer-panel  force-narrow="true">
+    <div drawer class="drawer">
+      <h2>Dit is de drawer</h2>
+    </div>
+
+
+<div main>
+    <div class="drawerclicker">
+      <img paper-drawer-toggle class="drawerbtn greenback" src="../../images/a_wit-rgb.svg">
+      <span class="flex"></span>
+    </div>
+<neon-animated-pages  id="pages" selected="[[selected]]" entry-animation="{{entryAnimation}}" exit-animation="{{exitAnimation}}">
+
+    <neon-animatable>
+    <labs-user on-no-user="_NoUserFound" nakeduserid="{{userid}}" pincode="{{pin2}}" id="labsuser" on-user-created="_OpenfireUser"></labs-user>
+    </neon-animatable>
+
+    <dp-pin on-yes="toggleDrawer" on-pin-entered="_Next" pin="{{pin1}}" titel="Geef een pincode in." error="{{error}}">
+    </dp-pin>
+
+
+    <dp-pin on-yes="toggleDrawer" on-pin-entered="_CreateUser" pin="{{pin2}}" titel="Herhaal deze code.">
+    </dp-pin>
+
+
+<neon-animatable>
+<div class="randommsg">
+<h2>Je gaf twee verschillende codes op.</h2>
+<br>
+<button on-click="pinAgain">Begin opnieuw</button>
+</div>
+</neon-animatable>
+
+
+    <labs-openfire
+      id="openfire" 
+      on-user-created="_Loggersfunctie"  ></labs-openfire>
+
+
+
+
+
+<neon-animatable>
+<div class="layout fit vertical center-center greenback">
+<h2>Fok of! Niet ingelogd, BITCH</h2>
+</div>
+</neon-animatable>
+
+
+
+
+<!--     <dp-add on-next="_Next">
+    </dp-add> -->
+
+<!--     <dp-firstadd on-next="_Next">
+    </dp-firstadd>
+
+    <dp-cardlist on-previous="_Prev">
+    </dp-cardlist>
+ -->
+</neon-animated-pages>
+</div>
+    </paper-drawer-panel>
+
+  </template>
+  <script>
+  (function() {
+    Polymer({
+      is: 'dp-stage',
+
+      properties: {
+        toggle: {
+          type: Boolean,
+          value: true,
+          notify: true
+        },
+      userid: {
+          type: String,
+          observer: '_userid'
+        }
+      },
+
+      ready:function (){
+        this.selected = 0;
+        this.entryAnimation = 'slide-from-right-animation';
+        this.exitAnimation = 'slide-left-animation';
+        // this.timing = timing-delay(500);
+      },
+
+      _Next:function (){
+        this.selected = (this.selected + 1);
+      },
+
+      _Prev:function (){
+        this.selected = (this.selected - 1);
+      },
+
+
+      _NoUserFound: function() {
+        console.log('No user found');
+        this.selected = 1;
+
+      },
+
+      _CreateUser:function() {
+        if (this.pin1 == this.pin2){
+        this.$.labsuser.createUser();
+        }
+        else {
+          this.selected = 3;
+          // this.selected = (this.selected - 1);
+          console.log ('NIET JUIST, PINS MATCHEN NIET', this.error);
+          this.error = "De pincodes komen niet overeen. Gelieve te herbeginnen.";
+          this.pin1 = '';
+          this.pin2 = '';
+        }
+      },
+
+      pinAgain:function(){
+          this.selected = 1;
+
+      },
+
+      toggleDrawer:function() {
+        console.log( "Open the Drawer");
+      },
+
+      _OpenfireUser:function() {
+        /*  HIER GAAN WE DE OPEN FIRE USER CREEREN EN INLOGGEN */
+        this.$.openfire.createUser(this.userid,this.pin2);
+
+      },
+
+      _userid: function(){
+        console.log(this.userid);
+      },
+
+      _Loggersfunctie:function(){
+        console.log('Yeeeeeey!!!!!!!!!!!');
+      }
+
+    });
+  })();
+  </script>
+</dom-module>

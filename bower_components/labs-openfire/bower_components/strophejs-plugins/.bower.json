@@ -1,0 +1,14 @@
+{
+  "name": "strophejs-plugins",
+  "homepage": "https://github.com/metajack/strophejs-plugins",
+  "_release": "96da306f53",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "96da306f5394b901e190a3f7365fbbb676fddb51"
+  },
+  "_source": "git://github.com/metajack/strophejs-plugins.git",
+  "_target": "*",
+  "_originalSource": "metajack/strophejs-plugins",
+  "_direct": true
+}

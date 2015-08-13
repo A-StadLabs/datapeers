@@ -1,0 +1,248 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/neon-animation/neon-animatable.html">
+<link rel="import" href="../../bower_components/neon-animation/neon-animations.html">
+<link rel="import" href="../addgrow-animation.html">
+<link rel="import" href="../addshrink-animation.html">
+
+<dom-module id="dp-add">
+  <style>
+    :host {
+      display: block;
+      --de-hoogte: 60px;
+      --de-zichtbaarheid: hidden;
+      z-index: 10000;
+
+    }
+
+    .addcanvas {
+      width: 100%;
+      height: var(--de-hoogte);
+      @apply(--layout-vertical);
+      background-color: var(--primary-oranje);
+    }
+
+
+    .addcanvas2 {
+      width: 100%;
+      height: inherit;
+      visibility: var(--de-zichtbaarheid);
+      @apply(--layout-vertical);
+      @apply(--layout-center-center);      
+    }
+
+
+    .addcanvas3 {
+      width: 100%;
+      visibility: var(--de-zichtbaarheid);
+      @apply(--layout-horizontal);
+      @apply(--layout-center-center);
+      padding: 10px;      
+    }
+
+
+    .switch {
+      height: 50px;
+      width: 50px;
+      @apply(--layout-vertical);
+      @apply(--layout-center-center);
+    }
+
+
+
+    h2 {
+      margin: 0px;
+      padding: 0px;
+    }
+
+
+    .paper-input-container-0 label, paper-input-char-counter, .paper-input-container-0 input {
+      font-family: 'Open Sans', sans-serif;
+      text-align: center;
+    }
+
+
+    .paper-input-container-0 input {
+      font-size: 22px;
+      line-height: 10px;
+      color: white;
+      font-weight: 600;
+
+    }
+
+    paper-input-char-counter {
+      color:rgba(0,0,0,0.35);
+
+    }
+
+
+  </style>
+  <template>
+  <div class="addcanvas" id="addcanvas">
+
+    <div class="layout horizontal">
+      <span class="flex"></span>
+      <div class="switch" on-click="_addCanvasShow">
+        <h2><span>{{addSign}}</span></h2>
+      </div>
+    </div>
+
+    <div class="addcanvas2" id="addcanvas2">
+        <paper-input-container no-label-float>
+        <label>Wat wil je toevoegen?</label>
+        <input is="iron-input" bind-value="{{postal}}">
+      </paper-input-container>
+    </div>
+
+    <div class="addcanvas3">
+        <small on-click="_Clear"> Annuleren</small>
+        <button on-click="_Confirm">YES!</button>
+    </div>
+
+  </div>
+  </template>
+  <script>
+  (function() {
+    Polymer({
+      is: 'dp-add',
+
+      behaviors: [
+      Polymer.NeonAnimatableBehavior,
+      Polymer.NeonAnimationRunnerBehavior
+      ],
+
+
+      properties: {
+        addSign: {
+          type: String,
+          value: '+',
+          notify: true
+        },
+
+
+        addState: {
+          type: Boolean,
+          value: false,
+          notify: true
+        },
+
+
+
+      animationConfig: {
+
+        value: function() {
+          return {
+
+
+            'grow': {
+              name: 'addgrow-animation',
+              node: this.$.addcanvas,
+              timing: {duration: 300}
+            },
+
+            'shrink': {
+              name: 'addshrink-animation',
+              node: this.$.addcanvas,
+              timing: {duration: 300}
+            },
+
+
+
+            // 'entry': {
+            //   name: 'hero-animation',
+            //   id: 'hero',
+            //   fromPage: this
+            // },
+            // 'exit': [{
+            //   name: 'transform-animation',
+            //   node: this.$.addcanvas
+            // }, {
+            //   name: 'hero-animation',
+            //   id: 'hero',
+            //   toPage: this
+            // }]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          };
+        }
+      }
+
+      },
+
+
+    ready: function(){
+
+      this.sharedElements = {
+        'hero': this.$.addbtn,
+      };
+      console.log(this.addState);
+
+    },
+
+
+
+    _addCanvasShow:function() {
+      // this.fire('next');
+
+      this.addState = !this.addState;
+      console.log(this.addState);
+
+      if(this.addState==true){
+          this.playAnimation('grow');
+          this.customStyle['--de-hoogte'] = '450px';
+          this.customStyle['--de-zichtbaarheid'] = 'visible';
+
+          this.updateStyles();
+          this.addSign = '-';
+
+      } else {
+          this.playAnimation('shrink');
+          this.customStyle['--de-hoogte'] = '60px';
+          this.customStyle['--de-zichtbaarheid'] = 'hidden';
+          this.updateStyles();
+          this.addSign = '+';
+
+      };
+    },
+
+
+
+    _Clear:function(){
+    console.log("Content weg! Alles weg, spons derover");
+    this._addCanvasShow();
+
+    },
+
+    _Confirm:function(){
+      console.log("Kaartje maken!!!");
+      this._addCanvasShow();
+
+    }    
+
+
+
+    });
+  })();
+  </script>
+</dom-module>

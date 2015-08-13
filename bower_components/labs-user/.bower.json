@@ -1,0 +1,38 @@
+{
+  "name": "labs-user",
+  "authors": [
+    "Anonymous <anonymous@example.com>"
+  ],
+  "description": "An element providing a solution to no problem in particular.",
+  "keywords": [
+    "web-component",
+    "web-components",
+    "polymer",
+    "seed"
+  ],
+  "main": "labs-user.html",
+  "license": "http://polymer.github.io/LICENSE.txt",
+  "homepage": "https://github.com/<USERNAME>/seed-element/",
+  "ignore": [
+    "/.*",
+    "/test/",
+    "/demo/"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.0.0",
+    "node-uuid": "~1.4.3",
+    "iron-elements": "PolymerElements/iron-elements"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0"
+  },
+  "_release": "d549a95bb5",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "d549a95bb5998913eada4d729a3a608d786a7323"
+  },
+  "_source": "git://github.com/A-Elements/labs-user.git",
+  "_target": "*",
+  "_originalSource": "A-Elements/labs-user"
+}

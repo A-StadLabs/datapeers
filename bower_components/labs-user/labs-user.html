@@ -1,0 +1,185 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-localstorage/iron-localstorage.html">
+<script src="../../bower_components/node-uuid/uuid.js"></script>
+<script src="//crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/aes.js"></script>
+<!--
+An element providing a solution to no problem in particular.
+
+Example:
+
+    <labs-user></labs-user>
+
+@demo
+-->
+<dom-module id="labs-user">
+
+  <style>
+    :host {
+      display: block;
+      box-sizing: border-box;
+    }
+
+  </style>
+
+  <template>
+    
+    <iron-localstorage 
+      name="labs_Profile" 
+      value="{{encruserid}}"
+      on-iron-localstorage-load-empty="fireEmpty" 
+      ></iron-localstorage>
+
+  </template>
+
+</dom-module>
+
+<script>
+
+  Polymer({
+
+    is: 'labs-user',
+
+    properties: {
+
+
+      /**
+       * Userid gives you the uuid for this device
+       */
+      userid: {
+        type: String,
+        observer: "_userid",
+        notify: true
+      },
+
+      pincode: {
+        type: Number,
+        notify: true,
+        observer: '_logPincode'
+      },
+
+      nakeduserid: {
+        type: String,
+        notify: true
+      },
+
+
+
+      /**
+       * If we have a user, this will give you the userobject.
+       *
+       * @type {{name: string, image: string}}
+       */
+      userobject: {
+        type: Object,
+        value: function() {
+          return {
+            // Returns the decoded userobject
+          };
+        }
+      },
+
+    },
+
+    // Element Lifecycle
+
+    ready: function() {
+      // `ready` is called after all elements have been configured, but
+      // propagates bottom-up. This element's children are ready, but parents
+      // are not.
+      //
+      // This is the point where you should make modifications to the DOM (when
+      // necessary), or kick off any processes the element wants to perform.
+    },
+
+    attached: function() {
+      // `attached` fires once the element and its parents have been inserted
+      // into a document.
+      //
+      // This is a good place to perform any work related to your element's
+      // visual state or active behavior (measuring sizes, beginning animations,
+      // loading resources, etc).
+    },
+
+    detached: function() {
+      // The analog to `attached`, `detached` fires when the element has been
+      // removed from a document.
+      //
+      // Use this to clean up anything you did in `attached`.
+    },
+
+    // Element Behavior
+
+    /**
+     * The `user-found` event is fired when we find a user.
+     *
+     * @event user-found
+     * @detail {{detail: String}}
+     */
+
+
+    /**
+     * Fired when we can't find a user in localstorage.
+     *
+     */
+
+     fireEmpty: function(){
+        this.fire('no-user');
+     },
+
+     /**
+     * Create a user (needs pincode) and save encrypted in localstorage.
+     * Encryption is userid + salt (pincode).
+     * When user is created, you get on-user-created trigger.
+     */
+
+    createUser: function() {
+        var nakeduserid = uuid.v1();
+        var pincode = this.pincode.toString();
+        this.nakeduserid = nakeduserid;
+        var tmpuserid = CryptoJS.AES.encrypt(nakeduserid, pincode);
+        this.encruserid = tmpuserid.toString();
+        this.fire('user-created');
+        this.userfound();
+    },
+
+    /**
+     * Fired when we can't find a user.
+     *
+     */
+    _userid: function() {
+        if(this.userid!=null){
+          this.userfound();
+        }
+    },
+
+
+    _logPincode: function(){
+      //console.log('labs-user found pincode; ', this.pincode);
+    },
+
+
+    /**
+     * Fired when we find a user.
+     * 
+     */
+    userfound: function() {
+      var pincode = this.pincode;
+      var decrypted = CryptoJS.AES.decrypt(this.nakeduserid, pincode);
+      console.log("Decrypted user: ", decrypted);
+      var decrtostring = decrypted.toString(CryptoJS.enc.Utf8);
+      this.nakeduserid = decrtostring;
+      this.fire('user-found', {detail: this.nakeduserid});
+    }
+
+  });
+
+</script>
