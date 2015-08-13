@@ -123,9 +123,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </div>
 <neon-animated-pages  id="pages" selected="[[selected]]" entry-animation="{{entryAnimation}}" exit-animation="{{exitAnimation}}">
 
-    <neon-animatable>
+<!--     <neon-animatable> -->
+    <dp-profile></dp-profile>
     <labs-user on-no-user="_NoUserFound" nakeduserid="{{userid}}" pincode="{{pin2}}" id="labsuser" on-user-created="_OpenfireUser"></labs-user>
-    </neon-animatable>
+ <!--    </neon-animatable> -->
 
     <dp-pin on-yes="toggleDrawer" on-pin-entered="_Next" pin="{{pin1}}" titel="Geef een pincode in." error="{{error}}">
     </dp-pin>
